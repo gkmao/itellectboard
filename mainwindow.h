@@ -45,6 +45,7 @@
 #include <opencv/cv.h>
 #include <opencv/highgui.h>
 #include "faceitem.h"
+#include "classification.h"
 
 namespace Ui
 {
@@ -96,6 +97,6 @@ private:
     vector<Face>         currentFaces;
 	IplImage*			 frame;
 	CvCapture*			 cam;
+	Classifier*			 gender_recognize;
 };
-
 #endif // MAINWINDOW_H

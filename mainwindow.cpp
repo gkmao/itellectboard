@@ -8,59 +8,64 @@ MainWindow::MainWindow(QWidget* parent)
             ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
+	string model_file   = "deploy_gender.prototxt";
+	string trained_file = "gender_net.caffemodel";
+	string mean_file    = "mean.binaryproto";
+	string label_file   = "gender_label.txt";
+	gender_recognize = new Classifier(model_file, trained_file, mean_file, label_file);
 
 	cam = NULL;
 	timer = new QTimer(this);
-    this->connect(ui->openImageBtn, SIGNAL(clicked()), this, SLOT(openImage()));
-    this->connect(ui->openConfigBtn, SIGNAL(clicked()), this, SLOT(openConfig()));
-    this->connect(ui->detectFacesBtn, SIGNAL(clicked()), this, SLOT(detectFaces()));
-    this->connect(ui->recogniseBtn, SIGNAL(clicked()), this, SLOT(recognise()));
-    this->connect(ui->updateDatabaseBtn, SIGNAL(clicked()), this, SLOT(updateConfig()));
-    this->connect(ui->saveConfigBtn, SIGNAL(clicked()), this, SLOT(saveConfig()));
+	//    this->connect(ui->openImageBtn, SIGNAL(clicked()), this, SLOT(openImage()));
+	this->connect(ui->openConfigBtn, SIGNAL(clicked()), this, SLOT(openConfig()));
+	this->connect(ui->detectFacesBtn, SIGNAL(clicked()), this, SLOT(detectFaces()));
+	this->connect(ui->recogniseBtn, SIGNAL(clicked()), this, SLOT(recognise()));
+	this->connect(ui->updateDatabaseBtn, SIGNAL(clicked()), this, SLOT(updateConfig()));
+	this->connect(ui->saveConfigBtn, SIGNAL(clicked()), this, SLOT(saveConfig()));
 	this->connect(ui->openCameraBtn, SIGNAL(clicked()), this, SLOT(openCamera()));
 	this->connect(ui->captureCameraBtn, SIGNAL(clicked()), this, SLOT(captureCamera()));
 	this->connect(timer, SIGNAL(timeout()), this, SLOT(readFrame()));
 
 
-    myScene = new QGraphicsScene();
+	myScene = new QGraphicsScene();
 
-    QHBoxLayout* layout = new QHBoxLayout;
-    myView              = new QGraphicsView(myScene);
-    layout->addWidget(myView);
+	QHBoxLayout* layout = new QHBoxLayout;
+	myView              = new QGraphicsView(myScene);
+	layout->addWidget(myView);
 
-    ui->widget->setLayout(layout);
+	ui->widget->setLayout(layout);
 
-    myView->setRenderHints(QPainter::Antialiasing);
-    myView->show();
+	myView->setRenderHints(QPainter::Antialiasing);
+	myView->show();
 
 
-    libFace = new LibFace(libface::ALL,QDir::currentPath().toStdString());
+	libFace = new LibFace(libface::ALL,QDir::currentPath().toStdString());
 
-    ui->configLocation->setText(QDir::currentPath());
+	ui->configLocation->setText(QDir::currentPath());
 }
 
 MainWindow::~MainWindow()
 {
-    delete ui;
+	delete ui;
 }
 
 void MainWindow::changeEvent(QEvent* e)
 {
-    QMainWindow::changeEvent(e);
-    switch (e->type())
-    {
-        case QEvent::LanguageChange:
-            ui->retranslateUi(this);
-            break;
-        default:
-            break;
-    }
+	QMainWindow::changeEvent(e);
+	switch (e->type())
+	{
+		case QEvent::LanguageChange:
+			ui->retranslateUi(this);
+			break;
+		default:
+			break;
+	}
 }
 
 void MainWindow::openCamera()
 {
-	cam = cvCreateCameraCapture(0);
-	
+	cam = cvCreateCameraCapture(1);
+
 	timer->start(33);
 }
 void MainWindow::readFrame()
@@ -115,15 +120,22 @@ void MainWindow::detectFaces()
 	cvSize.height = frame->height;
 	currentFaces = libFace->detectFaces(frame, cvSize);
 	int size     = currentFaces.size();
-
+	
 	for (i=0 ; i<size ; i++)
 	{
 		Face face          = currentFaces.at(i);
+		cv::Mat faceMat(face.getFace());
+		std::vector<Prediction> predictions = gender_recognize->Classify(faceMat);
+		string gender= predictions[0].first;
 		FaceItem* faceItem = new FaceItem(0, 
-				myScene,face.getX1()*scale, 
+				myScene,
+				face.getX1()*scale, 
 				face.getY1()*scale,
 				(face.getX2()-face.getX1())*scale, 
-				(face.getY2()-face.getY1())*scale);
+				(face.getY2()-face.getY1())*scale,
+				gender.c_str());
+
+
 
 		//cout << "Face:\t(" << face.getX1()*scale << ","<<face.getY1()*scale <<")" <<endl;
 	}

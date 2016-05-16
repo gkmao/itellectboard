@@ -7,8 +7,10 @@ TARGET = src
 INCLUDEPATH += .
 
 QT += widgets
-LIBS += -lface -lopencv_core -lopencv_highgui
+LIBS += -lface -lopencv_core -lopencv_highgui -lcaffe -lglog -lopencv_imgproc -lboost_system
 # Input
-HEADERS += faceitem.h mainwindow.h
+HEADERS += faceitem.h mainwindow.h \
+    classification.h
 FORMS += mainwindow.ui
-SOURCES += faceitem.cpp main.cpp mainwindow.cpp
+SOURCES += faceitem.cpp main.cpp mainwindow.cpp \
+    classification.cpp

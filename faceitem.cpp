@@ -45,12 +45,10 @@ FaceItem::FaceItem(QGraphicsItem* parent, QGraphicsScene* scene,
 	QBrush brush = QBrush(QColor(QString("red")));
 	QPen pen;
 	faceRect = scene->addRect(x, y, width, height,pen, brush);
-
-    faceRect->setOpacity(0.5);
-
-    //faceName = new QGraphicsTextItem(name, 0, scene);
-    //faceName->setPos(x-10,y-10);
-    //faceName->setFont(QFont("Helvetica"));
+		
+	faceName = scene->addText(name);
+    faceName->setPos(x-10,y-10);
+    faceName->setFont(QFont("Helvetica"));
 }
 
 QRectF FaceItem::boundingRect() const

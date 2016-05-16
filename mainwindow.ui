@@ -46,7 +46,7 @@
       <x>630</x>
       <y>100</y>
       <width>160</width>
-      <height>227</height>
+      <height>260</height>
      </rect>
     </property>
     <layout class="QVBoxLayout" name="verticalLayout">
@@ -68,6 +68,13 @@
       <widget class="QPushButton" name="openImageBtn">
        <property name="text">
         <string>Open Image</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="faceDecteBtn">
+       <property name="text">
+        <string>Face Detect</string>
        </property>
       </widget>
      </item>
@@ -111,6 +118,32 @@
      </rect>
     </property>
    </widget>
+   <widget class="QWidget" name="">
+    <property name="geometry">
+     <rect>
+      <x>640</x>
+      <y>390</y>
+      <width>102</width>
+      <height>20</height>
+     </rect>
+    </property>
+    <layout class="QHBoxLayout" name="horizontalLayout">
+     <item>
+      <widget class="QLabel" name="label">
+       <property name="text">
+        <string>性别：</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QLabel" name="genderLabel">
+       <property name="text">
+        <string/>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </widget>
   </widget>
   <widget class="QMenuBar" name="menuBar">
    <property name="geometry">
@@ -118,7 +151,7 @@
      <x>0</x>
      <y>0</y>
      <width>800</width>
-     <height>27</height>
+     <height>28</height>
     </rect>
    </property>
   </widget>

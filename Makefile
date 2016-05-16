@@ -36,7 +36,7 @@ DISTNAME      = src1.0.0
 DISTDIR = /home/mao/Documents/Qt/itellectboard/.tmp/src1.0.0
 LINK          = g++
 LFLAGS        = -m64 -Wl,-O1
-LIBS          = $(SUBLIBS) -L/usr/X11R6/lib64 -lface -lopencv_core -lopencv_highgui -lQt5Widgets -lQt5Gui -lQt5Core -lGL -lpthread 
+LIBS          = $(SUBLIBS) -L/usr/X11R6/lib64 -lface -lopencv_core -lopencv_highgui -lcaffe -lglog -lopencv_imgproc -lboost_system -lQt5Widgets -lQt5Gui -lQt5Core -lGL -lpthread 
 AR            = ar cqs
 RANLIB        = 
 SED           = sed
@@ -50,11 +50,13 @@ OBJECTS_DIR   = ./
 
 SOURCES       = faceitem.cpp \
 		main.cpp \
-		mainwindow.cpp moc_faceitem.cpp \
+		mainwindow.cpp \
+		classification.cpp moc_faceitem.cpp \
 		moc_mainwindow.cpp
 OBJECTS       = faceitem.o \
 		main.o \
 		mainwindow.o \
+		classification.o \
 		moc_faceitem.o \
 		moc_mainwindow.o
 DIST          = /usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/spec_pre.prf \
@@ -115,9 +117,11 @@ DIST          = /usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/spec_pre.prf \
 		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/yacc.prf \
 		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/lex.prf \
 		src.pro faceitem.h \
-		mainwindow.h faceitem.cpp \
+		mainwindow.h \
+		classification.h faceitem.cpp \
 		main.cpp \
-		mainwindow.cpp
+		mainwindow.cpp \
+		classification.cpp
 QMAKE_TARGET  = src
 DESTDIR       = #avoid trailing-slash linebreak
 TARGET        = src
@@ -285,8 +289,8 @@ dist: distdir FORCE
 distdir: FORCE
 	@test -d $(DISTDIR) || mkdir -p $(DISTDIR)
 	$(COPY_FILE) --parents $(DIST) $(DISTDIR)/
-	$(COPY_FILE) --parents faceitem.h mainwindow.h $(DISTDIR)/
-	$(COPY_FILE) --parents faceitem.cpp main.cpp mainwindow.cpp $(DISTDIR)/
+	$(COPY_FILE) --parents faceitem.h mainwindow.h classification.h $(DISTDIR)/
+	$(COPY_FILE) --parents faceitem.cpp main.cpp mainwindow.cpp classification.cpp $(DISTDIR)/
 	$(COPY_FILE) --parents mainwindow.ui $(DISTDIR)/
 
 
@@ -349,6 +353,9 @@ mainwindow.o: mainwindow.cpp mainwindow.h \
 		faceitem.h \
 		ui_mainwindow.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o mainwindow.o mainwindow.cpp
+
+classification.o: classification.cpp classification.h
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o classification.o classification.cpp
 
 moc_faceitem.o: moc_faceitem.cpp 
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o moc_faceitem.o moc_faceitem.cpp
