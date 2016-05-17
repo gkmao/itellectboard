@@ -30,7 +30,10 @@
  * ============================================================ */
 
 #include "faceitem.h"
+#include <QBrush>
+#include <QPen>
 #include <QGraphicsScene>
+#include <QDebug>
 
 FaceItem::FaceItem(QGraphicsItem* parent, QGraphicsScene* scene, 
                    double x, double y, double width, double height, QString name)
@@ -39,16 +42,18 @@ FaceItem::FaceItem(QGraphicsItem* parent, QGraphicsScene* scene,
 //    faceRect = new QGraphicsRectItem( 0, scene);
 //
 //    faceRect->setRect(x, y, width, height );
-//
-//    faceRect->setBrush(QBrush(QColor(QString("red"))));
-
-	QBrush brush = QBrush(QColor(QString("red")));
-	QPen pen;
+	
+	QBrush brush;
+	QPen pen = QPen(QColor(QString("red")));
 	faceRect = scene->addRect(x, y, width, height,pen, brush);
-		
+    faceRect->setOpacity(0.5);
+	//qDebug() << name ;	
+	
+    //faceName = new QGraphicsTextItem(name, 0, scene);
 	faceName = scene->addText(name);
-    faceName->setPos(x-10,y-10);
-    faceName->setFont(QFont("Helvetica"));
+   faceName->setPos(x-20,y-20);
+   faceName->setDefaultTextColor(QColor(QString("red")));
+   faceName->setFont(QFont("Helvetica"));
 }
 
 QRectF FaceItem::boundingRect() const

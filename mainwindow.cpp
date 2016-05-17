@@ -1,3 +1,34 @@
+/** ===========================================================
+ * @file
+ *
+ * This file is a part of libface project
+ * <a href="http://libface.sourceforge.net">http://libface.sourceforge.net</a>
+ *
+ * @date    2010-10-02
+ * @brief   main window.
+ *
+ * @author Copyright (C) 2010 by Alex Jironkin
+ *         <a href="alexjironkin at gmail dot com">alexjironkin at gmail dot com</a>
+ * @author Copyright (C) 2010 by Aditya Bhatt
+ *         <a href="adityabhatt at gmail dot com">adityabhatt at gmail dot com</a>
+ * @author Copyright (C) 2010 by Gilles Caulier
+ *         <a href="mailto:caulier dot gilles at gmail dot com">caulier dot gilles at gmail dot com</a>
+ *
+ * @section LICENSE
+ *
+ * This program is free software; you can redistribute it
+ * and/or modify it under the terms of the GNU General
+ * Public License as published by the Free Software Foundation;
+ * either version 2, or (at your option)
+ * any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * ============================================================ */
+
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 
@@ -8,24 +39,20 @@ MainWindow::MainWindow(QWidget* parent)
             ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
+
+
 	string model_file   = "deploy_gender.prototxt";
 	string trained_file = "gender_net.caffemodel";
 	string mean_file    = "mean.binaryproto";
 	string label_file   = "gender_label.txt";
 	gender_recognize = new Classifier(model_file, trained_file, mean_file, label_file);
 
-	cam = NULL;
-	timer = new QTimer(this);
-	//    this->connect(ui->openImageBtn, SIGNAL(clicked()), this, SLOT(openImage()));
+	this->connect(ui->openImageBtn, SIGNAL(clicked()), this, SLOT(openImage()));
 	this->connect(ui->openConfigBtn, SIGNAL(clicked()), this, SLOT(openConfig()));
 	this->connect(ui->detectFacesBtn, SIGNAL(clicked()), this, SLOT(detectFaces()));
 	this->connect(ui->recogniseBtn, SIGNAL(clicked()), this, SLOT(recognise()));
 	this->connect(ui->updateDatabaseBtn, SIGNAL(clicked()), this, SLOT(updateConfig()));
 	this->connect(ui->saveConfigBtn, SIGNAL(clicked()), this, SLOT(saveConfig()));
-	this->connect(ui->openCameraBtn, SIGNAL(clicked()), this, SLOT(openCamera()));
-	this->connect(ui->captureCameraBtn, SIGNAL(clicked()), this, SLOT(captureCamera()));
-	this->connect(timer, SIGNAL(timeout()), this, SLOT(readFrame()));
-
 
 	myScene = new QGraphicsScene();
 
@@ -62,30 +89,16 @@ void MainWindow::changeEvent(QEvent* e)
 	}
 }
 
-void MainWindow::openCamera()
-{
-	cam = cvCreateCameraCapture(1);
-
-	timer->start(33);
-}
-void MainWindow::readFrame()
-{
-	frame = cvQueryFrame(cam);
-	openImage();
-}
-
-void MainWindow::captureCamera()
-{
-	frame = cvQueryFrame(cam);
-	openImage();
-	timer->stop();
-}
 void MainWindow::openImage()
 {
+	//    QString file = QFileDialog::getOpenFileName(this,
+	//            tr("Open Image"), QDir::currentPath(), tr("Image Files (*.png *.jpg *.bmp)"));
+
+	QString file = "/home/mao/Pictures/Webcam/2016-05-15-220414.jpg";
 	clearScene();
 
-	QPixmap* photo = new QPixmap(frame->width, frame->height);
-	photo->convertFromImage(QImage((const uchar* )frame->imageData, frame->width, frame->height, QImage::Format_RGB888));
+	currentPhoto   = string(file.toLatin1().data());
+	QPixmap* photo = new QPixmap(file);
 	lastPhotoItem  = new QGraphicsPixmapItem(*photo);
 
 	if(1.*ui->widget->width()/photo->width() < 1.*ui->widget->height()/photo->height())
@@ -115,27 +128,21 @@ void MainWindow::openConfig()
 void MainWindow::detectFaces()
 {
 	int i;
-	CvSize cvSize;
-	cvSize.width = frame->width;
-	cvSize.height = frame->height;
-	currentFaces = libFace->detectFaces(frame, cvSize);
+	currentFaces = libFace->detectFaces(currentPhoto);
 	int size     = currentFaces.size();
-	
+
 	for (i=0 ; i<size ; i++)
 	{
 		Face face          = currentFaces.at(i);
 		cv::Mat faceMat(face.getFace());
 		std::vector<Prediction> predictions = gender_recognize->Classify(faceMat);
-		string gender= predictions[0].first;
+		string gender = predictions[0].first;
 		FaceItem* faceItem = new FaceItem(0, 
-				myScene,
-				face.getX1()*scale, 
+				myScene,face.getX1()*scale, 
 				face.getY1()*scale,
 				(face.getX2()-face.getX1())*scale, 
 				(face.getY2()-face.getY1())*scale,
 				gender.c_str());
-
-
 
 		//cout << "Face:\t(" << face.getX1()*scale << ","<<face.getY1()*scale <<")" <<endl;
 	}

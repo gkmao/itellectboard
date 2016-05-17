@@ -37,13 +37,10 @@
 #include <QGraphicsView>
 #include <QGraphicsPixmapItem>
 #include <QFileDialog>
-#include <QTimer>
 
 #include <libface/LibFace.h>
 #include <libface/Face.h>
 
-#include <opencv/cv.h>
-#include <opencv/highgui.h>
 #include "faceitem.h"
 #include "classification.h"
 
@@ -66,14 +63,12 @@ public:
 
 public slots:
 
+    void openImage();
     void openConfig();
     void detectFaces();
     void updateConfig();
     void recognise();
     void saveConfig();
-	void readFrame();
-	void openCamera();
-	void captureCamera();
 
 protected:
 
@@ -81,7 +76,6 @@ protected:
 
 private:
 
-    void openImage();
     void clearScene();
 
 private:
@@ -93,10 +87,8 @@ private:
     LibFace*             libFace;
     string               currentPhoto;
     double               scale;
-	QTimer*				 timer;
     vector<Face>         currentFaces;
-	IplImage*			 frame;
-	CvCapture*			 cam;
 	Classifier*			 gender_recognize;
 };
+
 #endif // MAINWINDOW_H
